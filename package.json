@@ -1,6 +1,9 @@
 {
   "name": "tic-tac-toe-2",
   "version": "0.1.0",
+  "authors": [
+    "Amanda McDermott <amanda.p.mcdermott@gmail.com>"
+  ],
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
