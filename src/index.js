@@ -1,23 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import _ from 'lodash'
 
-// class Quant extends React.component {
+// function Quant (props) {
 //   // this will handle the spooky marks
-//   constructor (props) {
-//     this.state = {
-//       spookys: []
-//     }
-//   }
 //   // can have up to 8 spookys
-//   // click handler should push each spooky onto the array
-//   render() {
-//     return (
-//       <div>
-//         {this.state.spookys}
-//       </div>
-//     )
-//   }
+//   // click handler should push each spooky onto the game state array
+//   return (
+//     <div>
+//       {props.spookys}
+//     </div>
+//   )
 // }
 
 // square contains quants and a classic TTT value after collapse
@@ -34,13 +28,14 @@ function Square (props) {
         style={style}
       >
         {props.value}
+        {props.spookys}
       </button>
   )
 }
 
 class Board extends React.Component {
   renderSquare(i) {
-    const side = 50;
+    const side = 80;
     return (
       <Square
         key={i}
@@ -48,6 +43,7 @@ class Board extends React.Component {
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
         style={`width: ${side * 3}px`}
+        spookys={this.props.spookys[i]}
       />
     );
   }
@@ -83,37 +79,30 @@ class Game extends React.Component {
 
   initialState () {
     return ({
-      gameHistory: [{
-        squares: Array(9).fill(null),
-        spookys: [1,2,3,4,5,6,7,8,9].reduce(
-          (acc, curr) => {
-            Object.defineProperty(acc, curr, {
-              value: [],
-              writable: true,
-              enumerable: true,
-              configurable: true
-            });
-            return acc
-          }, {}
-        )
-      }],
-      symbol: 'X',
+      player: 'X',
+      spookysPlayed: 0, // players get 2 per turn
+      turn: 1,
+      squares: Array(9).fill(null),
+      spookys: _.range(9).reduce(
+        (acc, curr) => {
+          Object.defineProperty(acc, curr, {
+            value: [],
+            writable: true,
+            enumerable: true,
+            configurable: true
+          });
+          return acc
+        }, {}
+      ),
+      currentMove: {},
     })
   }
 
-  handleClick(i) {
-    const gameHistory = this.state.gameHistory;
-    const current = gameHistory[gameHistory.length - 1];
-    const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
-      return;
-    }
-    squares[i] = this.state.symbol;
+  handleClick(square) {
+    if (Object.keys(this.state.currentMove).length === 2) { return }
+    const move = this.state.player + this.state.turn
     this.setState({
-      gameHistory: gameHistory.concat([{
-        squares: squares,
-      }]),
-      symbol: this.state.symbol === 'X' ? 'O' : 'X',
+      currentMove: Object.assign(this.state.currentMove, { [square]: [ move ] })
     });
   }
 
@@ -124,27 +113,35 @@ class Game extends React.Component {
     })
   }
 
+  submitMove() {
+    let newSpookys = _.mergeWith(this.state.spookys, this.state.currentMove,
+      (objValue, srcValue) => {
+        return objValue.concat(srcValue);
+      })
+
+    this.setState({
+      spookys: newSpookys,
+      player: this.state.player === 'X' ? 'O' : 'X',
+      currentMove: {},
+      turn: this.state.turn + 1,
+    })
+  }
+
   render() {
-    const gameHistory = this.state.gameHistory;
-    const current = gameHistory[gameHistory.length - 1];
-    const winner = calculateWinner(current.squares);
-    let status;
-    if (winner) {
-      status = `Winner: ${winner}`;
-    } else {
-      status = `Next player: ${this.state.symbol}`;
-    }
+    const status = `Player: ${this.state.player} Turn: ${this.state.turn}`;
 
     return (
       <div className="game">
         <div className="game-board">
           <Board
-            squares={current.squares}
+            squares={this.state.squares}
+            spookys={this.state.spookys}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
         <div className="game-info">
           <div className="status">{status}</div>
+          <button onClick={() => this.submitMove()}>Submit Move</button>
           <button onClick={() => this.resetGame()}>Reset</button>
         </div>
       </div>
@@ -158,23 +155,3 @@ ReactDOM.render(
   <Game />,
   document.getElementById('root')
 );
-
-function calculateWinner(squares) {
-  const winningSets = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < winningSets.length; i++) {
-    const [a, b, c] = winningSets[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
-}
