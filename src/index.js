@@ -13,6 +13,7 @@ function Square (props) {
         onClick={props.onClick}
       >
         {props.spookys}
+        {props.currentMove}
       </button>
   )
 }
@@ -25,6 +26,7 @@ class Board extends React.Component {
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
         spookys={this.props.spookys[i]}
+        currentMove={this.props.currentMove[i] ? this.props.currentMove[i] : ''}
       />
     );
   }
@@ -98,7 +100,8 @@ class Game extends React.Component {
     let newSpookys = _.mergeWith(this.state.spookys, this.state.currentMove,
       (objValue, srcValue) => {
         return objValue.concat(srcValue);
-      })
+      }
+    )
 
     this.setState({
       spookys: newSpookys,
@@ -117,6 +120,7 @@ class Game extends React.Component {
           <Board
             squares={this.state.squares}
             spookys={this.state.spookys}
+            currentMove={this.state.currentMove}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
