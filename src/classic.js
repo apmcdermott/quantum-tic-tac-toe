@@ -2,36 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-// class Quant extends React.component {
-//   // this will handle the spooky marks
-//   constructor (props) {
-//     this.state = {
-//       spookys: []
-//     }
-//   }
-//   // can have up to 8 spookys
-//   // click handler should push each spooky onto the array
-//   render() {
-//     return (
-//       <div>
-//         {this.state.spookys}
-//       </div>
-//     )
-//   }
-// }
-
-// square contains quants and a classic TTT value after collapse
 function Square (props) {
-  let style = {
-    height: props.side + 'px',
-    width: props.side + 'px',
-  };
-
   return (
     <button
         className="square"
         onClick={props.onClick}
-        style={style}
       >
         {props.value}
       </button>
@@ -40,11 +15,9 @@ function Square (props) {
 
 class Board extends React.Component {
   renderSquare(i) {
-    const side = 50;
     return (
       <Square
         key={i}
-        side={side}
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
         style={`width: ${side * 3}px`}
@@ -77,25 +50,13 @@ class Board extends React.Component {
 
 class Game extends React.Component {
   constructor(props) {
-    super(props);
     this.state = this.initialState()
   }
 
   initialState () {
     return ({
       gameHistory: [{
-        squares: Array(9).fill(null),
-        spookys: [1,2,3,4,5,6,7,8,9].reduce(
-          (acc, curr) => {
-            Object.defineProperty(acc, curr, {
-              value: [],
-              writable: true,
-              enumerable: true,
-              configurable: true
-            });
-            return acc
-          }, {}
-        )
+        squares: Array(9).fill(null)
       }],
       symbol: 'X',
     })
