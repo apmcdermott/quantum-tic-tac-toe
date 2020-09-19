@@ -1,3 +1,9 @@
+# Q Tic Tac Toe
+
+Just tryna build this: https://en.wikipedia.org/wiki/Quantum_tic-tac-toe
+
+--------------
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
