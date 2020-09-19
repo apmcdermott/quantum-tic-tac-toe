@@ -15,6 +15,7 @@ ol, ul {
 
 .status {
   margin-bottom: 10px;
+  font-size: 24px;
 }
 
 .square {
@@ -32,10 +33,6 @@ ol, ul {
   width: 150px;
 }
 
-.square.clicked {
-  outline: 1px solid red;
-}
-
 .kbd-navigation .square:focus {
   background: #ddd;
 }
@@ -47,4 +44,10 @@ ol, ul {
 
 .game-info {
   margin-left: 20px;
+}
+
+.submit {
+  display: block;
+  height: 48px;
+  margin-bottom: 16px;
 }

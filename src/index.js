@@ -12,8 +12,7 @@ function Square (props) {
         className="square"
         onClick={props.onClick}
       >
-        {props.spookys}
-        {props.currentMove}
+        {props.spookys.concat(props.currentMove).join(' ')}
       </button>
   )
 }
@@ -126,8 +125,8 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div className="status">{status}</div>
-          <button onClick={() => this.submitMove()}>Submit Move</button>
-          <button onClick={() => this.resetGame()}>Reset</button>
+          <button className="submit" onClick={() => this.submitMove()}>Submit Move</button>
+          <button onClick={() => this.resetGame()}>Reset Game</button>
         </div>
       </div>
     );
