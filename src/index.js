@@ -3,31 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import _ from 'lodash'
 
-// function Quant (props) {
-//   // this will handle the spooky marks
-//   // can have up to 8 spookys
-//   // click handler should push each spooky onto the game state array
-//   return (
-//     <div>
-//       {props.spookys}
-//     </div>
-//   )
-// }
-
-// square contains quants and a classic TTT value after collapse
+// square contains the quant spooky marks
+// when a collapse event happens, it convers into a classic square
+// which has a single X val or O val
 function Square (props) {
-  let style = {
-    height: props.side + 'px',
-    width: props.side + 'px',
-  };
-
   return (
     <button
         className="square"
         onClick={props.onClick}
-        style={style}
       >
-        {props.value}
         {props.spookys}
       </button>
   )
@@ -35,14 +19,11 @@ function Square (props) {
 
 class Board extends React.Component {
   renderSquare(i) {
-    const side = 80;
     return (
       <Square
         key={i}
-        side={side}
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
-        style={`width: ${side * 3}px`}
         spookys={this.props.spookys[i]}
       />
     );
@@ -73,7 +54,7 @@ class Board extends React.Component {
 
 class Game extends React.Component {
   constructor(props) {
-    super(props);
+    super();
     this.state = this.initialState()
   }
 
