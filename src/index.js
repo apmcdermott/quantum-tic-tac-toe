@@ -1,31 +1,29 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import _ from 'lodash'
+// import _ from 'lodash'
 
 // square contains the quant spooky marks
 // when a collapse event happens, it convers into a classic square
 // which has a single X val or O val
-function Square (props) {
+function Quant (props) {
   return (
     <button
         className="square"
         onClick={props.onClick}
       >
-        {props.spookys.concat(props.currentMove).join(' ')}
+        {props.spookys}
       </button>
   )
 }
 
 class Board extends React.Component {
-  renderSquare(i) {
+  renderQuant(i) {
     return (
-      <Square
+      <Quant
         key={i}
-        value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
         spookys={this.props.spookys[i]}
-        currentMove={this.props.currentMove[i] ? this.props.currentMove[i] : ''}
       />
     );
   }
@@ -34,19 +32,19 @@ class Board extends React.Component {
     return (
       <div>
         <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
+          {this.renderQuant(0)}
+          {this.renderQuant(1)}
+          {this.renderQuant(2)}
         </div>
         <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
+          {this.renderQuant(3)}
+          {this.renderQuant(4)}
+          {this.renderQuant(5)}
         </div>
         <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
+          {this.renderQuant(6)}
+          {this.renderQuant(7)}
+          {this.renderQuant(8)}
         </div>
       </div>
     );
@@ -62,30 +60,29 @@ class Game extends React.Component {
   initialState () {
     return ({
       player: 'X',
-      spookysPlayed: 0, // players get 2 per turn
-      turn: 1,
+      playerTurn: 1, // players get 2 per turn
+      gameTurn: 1,
       squares: Array(9).fill(null),
-      spookys: _.range(9).reduce(
-        (acc, curr) => {
-          Object.defineProperty(acc, curr, {
-            value: [],
-            writable: true,
-            enumerable: true,
-            configurable: true
-          });
-          return acc
-        }, {}
-      ),
-      currentMove: {},
+      spookys: Array(9).fill(null).map(() => []),
     })
   }
 
-  handleClick(square) {
-    if (Object.keys(this.state.currentMove).length === 2) { return }
-    const move = this.state.player + this.state.turn
-    this.setState({
-      currentMove: Object.assign(this.state.currentMove, { [square]: [ move ] })
-    });
+  handleClick(i) {
+    const mark = `${this.state.player}${this.state.gameTurn}`
+    this.state.spookys[i].push(mark)
+
+    // end of first player turn, increment
+    if (this.state.playerTurn === 1) {
+      this.setState({
+        playerTurn: this.state.playerTurn + 1,
+      });
+    } else { // end 2nd player turn, swap players
+      this.setState({
+        gameTurn: this.state.gameTurn + 1,
+        player: this.state.player === 'X' ? 'O' : 'X',
+        playerTurn: 1,
+      });
+    }
   }
 
   resetGame() {
@@ -95,39 +92,28 @@ class Game extends React.Component {
     })
   }
 
-  submitMove() {
-    let newSpookys = _.mergeWith(this.state.spookys, this.state.currentMove,
-      (objValue, srcValue) => {
-        return objValue.concat(srcValue);
-      }
-    )
-
-    this.setState({
-      spookys: newSpookys,
-      player: this.state.player === 'X' ? 'O' : 'X',
-      currentMove: {},
-      turn: this.state.turn + 1,
-    })
-  }
-
   render() {
-    const status = `Player: ${this.state.player} Turn: ${this.state.turn}`;
+    const player = `${this.state.player}`;
+    const playerTurn = this.state.playerTurn;
 
     return (
-      <div className="game">
-        <div className="game-board">
-          <Board
-            squares={this.state.squares}
-            spookys={this.state.spookys}
-            currentMove={this.state.currentMove}
-            onClick={(i) => this.handleClick(i)}
-          />
+      <div>
+        <div className="game">
+          <div className="game-board">
+            <Board
+              squares={this.state.squares}
+              spookys={this.state.spookys}
+              onClick={(i) => this.handleClick(i)}
+            />
+          </div>
+          <div className="game-info">
+            <div className="status">{player} has {3 - playerTurn} left</div>
+            <button onClick={() => this.resetGame()}>Reset Game</button>
+          </div>
         </div>
-        <div className="game-info">
-          <div className="status">{status}</div>
-          <button className="submit" onClick={() => this.submitMove()}>Submit Move</button>
-          <button onClick={() => this.resetGame()}>Reset Game</button>
-        </div>
+        <ul>
+          debug
+        </ul>
       </div>
     );
   }
