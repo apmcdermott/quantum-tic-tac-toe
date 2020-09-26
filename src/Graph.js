@@ -41,14 +41,17 @@ class Graph  {
   addEdge(start, end, spooky) {
     const startNode = this.getNode(start)
     const endNode = this.getNode(end)
+
+    // need to create edges in both directions
     const edge = new Edge(startNode, endNode, spooky)
+    const reverseEdge = new Edge(endNode, startNode, spooky)
 
     // need to keep track of the edges from each turn (X1, O2, etc)
     this.edges[spooky] = edge
 
-    // also need to add the edge to both nodes
+    // also need to add the edges to their respective nodes
     startNode.edges.push(edge)
-    endNode.edges.push(edge)
+    endNode.edges.push(reverseEdge)
   }
 
   forEachNode(callback) {
