@@ -1,7 +1,7 @@
-// TTC boxes where you can put marks : nodes
-// connection between 2 boxes where you put the marks : edges
+// TTC boxes where you can put marks --> nodes
+// entaglements between 2 boxes where you put the marks --> edges
 
-// node id is the box no.
+// node id is the tic tac toe square, by number
 // nodes contain a list of all the connections (edges)
 // edges have two nodes that they connect, plus the mark
 
@@ -46,7 +46,7 @@ class Graph  {
     // need to keep track of the edges from each turn (X1, O2, etc)
     this.edges[spooky] = edge
 
-    // also need to add edge to both nodes
+    // also need to add the edge to both nodes
     startNode.edges.push(edge)
     endNode.edges.push(edge)
   }
