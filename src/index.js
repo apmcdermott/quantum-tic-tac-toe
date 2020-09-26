@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-// import _ from 'lodash'
+import Graph from './Graph'
 
 // square contains the quant spooky marks
 // when a collapse event happens, it convers into a classic square
@@ -54,6 +54,7 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props) {
     super();
+    this.graph = new Graph()
     this.state = this.initialState()
   }
 
@@ -62,27 +63,44 @@ class Game extends React.Component {
       player: 'X',
       playerTurn: 1, // players get 2 per turn
       gameTurn: 1,
-      squares: Array(9).fill(null),
-      spookys: Array(9).fill(null).map(() => []),
+      squares: Array(9).fill(null), // classic TTC board squares
+      spookys: Array(9).fill(null), // keeps track of all the spooky marks
+      lastMove: null
     })
   }
 
   handleClick(i) {
     const mark = `${this.state.player}${this.state.gameTurn}`
-    this.state.spookys[i].push(mark)
+    const spookys = this.state.spookys
+
+    if (spookys[i])
+      spookys[i].push(mark)
+    else
+      spookys[i] = [mark]
+
 
     // end of first player turn, increment
     if (this.state.playerTurn === 1) {
+      this.graph.addNode(i)
+      console.log(this.graph)
       this.setState({
         playerTurn: this.state.playerTurn + 1,
+        lastMove: i
       });
-    } else { // end 2nd player turn, swap players
-      this.setState({
-        gameTurn: this.state.gameTurn + 1,
-        player: this.state.player === 'X' ? 'O' : 'X',
-        playerTurn: 1,
-      });
+    } else { // end of second player turn, swap
+      this.graph.addNode(i)
+      this.graph.addEdge(this.state.lastMove, i, mark)
+      console.log(this.graph)
+      this.swapPlayers()
     }
+  }
+
+  swapPlayers() {
+    this.setState({
+      gameTurn: this.state.gameTurn + 1,
+      player: this.state.player === 'X' ? 'O' : 'X',
+      playerTurn: 1,
+    });
   }
 
   resetGame() {
