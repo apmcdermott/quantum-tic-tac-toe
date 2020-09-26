@@ -121,6 +121,21 @@ class Game extends React.Component {
     })
   }
 
+  debugNodes(graph) {
+    const nodes = Object.keys(graph.nodes).map((k, i) => {
+      let spookys = []
+      Object.keys(graph.nodes[k].edges).map((j) => {
+        spookys.push(graph.nodes[k].edges[j].spooky)
+      })
+
+      return <li key={i}>{k}: {spookys.join(' ')}</li>
+    })
+
+    return (
+      <ul>{nodes}</ul>
+    )
+  }
+
   render() {
     const player = `${this.state.player}`;
     const playerTurn = this.state.playerTurn;
@@ -141,7 +156,7 @@ class Game extends React.Component {
           </div>
         </div>
         <ul>
-          debug
+          {this.debugNodes(this.graph)}
         </ul>
       </div>
     );
