@@ -70,7 +70,8 @@ class Game extends React.Component {
   }
 
   handleClick(i) {
-    if (this.graph.containsNode(i)) { return } // you can't put two spooky marks in the same quant
+    // you can't put both spooky marks for a single turn in the same quant
+    if (!this.isFirstTurn() && this.state.lastMove === i) { return }
 
     const mark = `${this.state.player}${this.state.gameTurn}`
     const spookys = this.state.spookys
@@ -82,9 +83,8 @@ class Game extends React.Component {
     }
 
     this.graph.addNode(i) // add a node on both turns
-    console.log(this.graph)
 
-    if (this.state.playerTurn === 1) {
+    if (this.isFirstTurn()) {
       // end of first player turn: increment
       this.setState({
         playerTurn: this.state.playerTurn + 1,
@@ -93,9 +93,12 @@ class Game extends React.Component {
     } else {
       // end of second player turn: add edge, swap players
       this.graph.addEdge(this.state.lastMove, i, mark)
-      console.log(this.graph)
       this.swapPlayers()
     }
+  }
+
+  isFirstTurn() {
+    return this.state.playerTurn === 1
   }
 
   swapPlayers() {
@@ -128,7 +131,7 @@ class Game extends React.Component {
             />
           </div>
           <div className="game-info">
-            <div className="status">{player} has {3 - playerTurn} left</div>
+            <div className="status">{player}: Place spooky mark #{playerTurn}</div>
             <button onClick={() => this.resetGame()}>Reset Game</button>
           </div>
         </div>
