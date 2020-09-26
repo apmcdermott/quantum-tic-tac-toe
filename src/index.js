@@ -82,7 +82,16 @@ class Game extends React.Component {
       spookys[i] = [mark]
     }
 
-    this.graph.addNode(i) // add a node on both turns
+
+    if (!this.graph.containsNode(i)) { // don't replace the same node over and over if it already exists
+      this.graph.addNode(i) // add a node on both turns
+    }
+
+    if (!this.isFirstTurn()) { // add edge after both spooky marks have been placed
+      this.graph.addEdge(this.state.lastMove, i, mark)
+    }
+
+    console.log(this.graph.nodes)
 
     if (this.isFirstTurn()) {
       // end of first player turn: increment
@@ -91,22 +100,18 @@ class Game extends React.Component {
         lastMove: i
       })
     } else {
-      // end of second player turn: add edge, swap players
-      this.graph.addEdge(this.state.lastMove, i, mark)
-      this.swapPlayers()
+      // end of second player turn: swap
+      this.setState({
+        gameTurn: this.state.gameTurn + 1,
+        player: this.state.player === 'X' ? 'O' : 'X',
+        playerTurn: 1,
+        lastMove: i
+      });
     }
   }
 
   isFirstTurn() {
     return this.state.playerTurn === 1
-  }
-
-  swapPlayers() {
-    this.setState({
-      gameTurn: this.state.gameTurn + 1,
-      player: this.state.player === 'X' ? 'O' : 'X',
-      playerTurn: 1,
-    });
   }
 
   resetGame() {
