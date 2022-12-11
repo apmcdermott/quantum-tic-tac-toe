@@ -76,11 +76,11 @@ function Game() {
     }
   }
 
-  function isFirstTurn() {
+  function isFirstTurn(): boolean {
     return state.playerTurn === 1
   }
 
-  function resetGame() {
+  function resetGame(): void {
     setState(initialState)
   }
 

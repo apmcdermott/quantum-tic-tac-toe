@@ -5,14 +5,21 @@
 // nodes contain a list of all the connections (edges)
 // edges have two nodes that they connect, plus the mark
 
-class Node {
-  constructor(id) {
+class GNode {
+  id: number
+  edges: Array<number>
+
+  constructor(id: number) {
     this.id = id
     this.edges = []
   }
 }
 
 class Edge {
+  start: number
+  end: number
+  spooky: string
+
   constructor(start, end, spooky) {
     this.start = start
     this.end = end
@@ -20,14 +27,17 @@ class Edge {
   }
 }
 
-class Graph  {
+class Graph {
+  nodes: Record<any, any>
+  edges: Record<any, any>
+
   constructor() {
     this.nodes = {}
     this.edges = {}
   }
 
   addNode(id) {
-    this.nodes[id] = new Node(id)
+    this.nodes[id] = new GNode(id)
   }
 
   getNode(id) {
@@ -54,13 +64,13 @@ class Graph  {
     endNode.edges.push(reverseEdge)
   }
 
-  nodeCount() {
+  nodeCount(): number {
     return Object.keys(this.nodes).length
   }
 
-  checkCycle(startNodeId) {
+  checkCycle(startNodeId: Number) {
     let visited = {}
   }
 }
 
-module.exports = Graph
+export default Graph
