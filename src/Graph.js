@@ -49,15 +49,17 @@ class Graph  {
     // need to keep track of the edges from each turn (X1, O2, etc)
     this.edges[spooky] = edge
 
-    // also need to add the edges to their respective nodes
+    // also need to add the edge/reverseEdge to respective nodes
     startNode.edges.push(edge)
     endNode.edges.push(reverseEdge)
   }
 
-  forEachNode(callback) {
-    for (var node in this.nodes) {
-      callback(node)
-    }
+  nodeCount() {
+    return Object.keys(this.nodes).length
+  }
+
+  checkCycle(startNodeId) {
+    let visited = {}
   }
 }
 
