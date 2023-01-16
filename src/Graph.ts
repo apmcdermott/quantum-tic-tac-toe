@@ -6,71 +6,83 @@
 // edges have two nodes that they connect, plus the mark
 
 class GNode {
-  id: number
-  edges: Array<number>
+  id: number;
+  edges: Array<Edge>;
 
   constructor(id: number) {
-    this.id = id
-    this.edges = []
+    this.id = id;
+    this.edges = [];
   }
 }
 
 class Edge {
-  start: number
-  end: number
-  spooky: string
+  start: GNode;
+  end: GNode;
+  spooky: string;
 
-  constructor(start, end, spooky) {
-    this.start = start
-    this.end = end
-    this.spooky = spooky // spooky mark (e.g. X1)
+  constructor(start: GNode, end: GNode, spooky: string) {
+    this.start = start;
+    this.end = end;
+    this.spooky = spooky; // spooky mark (e.g. X1)
   }
 }
 
 class Graph {
-  nodes: Record<any, any>
-  edges: Record<any, any>
+  nodes: Array<GNode>;
+  edges: { [key: string]: Array<Edge> };
 
   constructor() {
-    this.nodes = {}
-    this.edges = {}
+    this.nodes = [];
+    this.edges = {};
   }
 
-  addNode(id) {
-    this.nodes[id] = new GNode(id)
+  addNode(id: number) {
+    this.nodes[id] = new GNode(id);
   }
 
-  getNode(id) {
-    return this.nodes[id]
+  getNode(id: number): GNode {
+    return this.nodes[id];
   }
 
-  containsNode(id) {
-    return this.nodes[id] ? true : false
+  containsNode(id: number) {
+    return this.nodes[id] ? true : false;
   }
 
-  addEdge(start, end, spooky) {
-    const startNode = this.getNode(start)
-    const endNode = this.getNode(end)
+  addEdge(start: number, end: number, spooky: string) {
+    const startNode = this.getNode(start);
+    const endNode = this.getNode(end);
 
     // need to create edges in both directions
-    const edge = new Edge(startNode, endNode, spooky)
-    const reverseEdge = new Edge(endNode, startNode, spooky)
+    const edge = new Edge(startNode, endNode, spooky);
+    const reverseEdge = new Edge(endNode, startNode, spooky);
+
+    console.log(this.edges);
+    const spookyEdges = this.edges[spooky]
+    if (spookyEdges) {
+
+    } else {
+      this.edges =
+    }
 
     // need to keep track of the edges from each turn (X1, O2, etc)
-    this.edges[spooky] = edge
+    // if (this.edges[spooky]) {
+    //   this.edges[spooky].push(edge);
+    // } else {
+    //   this.edges[spooky] = [edge];
+    // }
 
     // also need to add the edge/reverseEdge to respective nodes
-    startNode.edges.push(edge)
-    endNode.edges.push(reverseEdge)
+    // let e = startNode.edges;
+    // endNode.edges?.push(reverseEdge);
   }
 
   nodeCount(): number {
-    return Object.keys(this.nodes).length
+    return Object.keys(this.nodes).length;
   }
 
-  checkCycle(startNodeId: Number) {
-    let visited = {}
+  checkCycle(startNodeId: number) {
+    let visited = {};
   }
 }
 
-export default Graph
+export default Graph;

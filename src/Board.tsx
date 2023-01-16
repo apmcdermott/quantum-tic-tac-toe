@@ -1,23 +1,23 @@
-import React from 'react'
+import React from 'react';
 
-function Quant(props) {
+function Quant({ spookys, onClick }) {
   return (
-    <button className="square" onClick={props.onClick}>
-      {props.spookys}
+    <button className="square" onClick={onClick}>
+      {spookys}
     </button>
-  )
+  );
 }
 
-export function Board(props) {
+type BoardProps = {
+  squares: Array<string[] | null>;
+  spookys: Array<string[] | null>;
+  onClick: (i: number) => void;
+};
+
+export function Board({ squares, spookys, onClick }: BoardProps) {
   const renderQuant = (i: number) => {
-    return (
-      <Quant
-        key={i}
-        onClick={() => props.onClick(i)}
-        spookys={props.spookys[i]}
-      />
-    )
-  }
+    return <Quant key={i} onClick={() => onClick(i)} spookys={spookys[i]} />;
+  };
 
   return (
     <div>
@@ -37,5 +37,5 @@ export function Board(props) {
         {renderQuant(8)}
       </div>
     </div>
-  )
+  );
 }
