@@ -6,8 +6,10 @@ import { Board } from './Board';
 // square contains the quant spooky marks
 // when a collapse event happens, it convers into a classic square
 // which has a single X val or O val
+type Player = 'X' | 'O';
+
 type GameState = {
-  player: string;
+  player: Player;
   playerTurn: number;
   gameTurn: number;
   squares: Array<string[] | null>;
@@ -16,9 +18,8 @@ type GameState = {
 };
 
 function Game() {
-  let graph = new Graph();
   const initialState = {
-    player: 'X',
+    player: 'X' as Player,
     playerTurn: 1, // players get 2 per game turn
     gameTurn: 1,
     squares: Array(9).fill(null), // classic TTC board squares
@@ -26,73 +27,91 @@ function Game() {
     lastMove: null,
   };
 
-  const [state, setState] = useState<GameState>(initialState);
+  const [game, setGame] = useState<GameState>(initialState);
+
+  const [graph, setGraph] = useState(new Graph());
+  const [squares, setSquares] = useState(initialState.squares);
+  const [spookys, setSpookys] = useState(initialState.spookys);
+
+  const setSpookyMarks = (i: number, mark: string) => {
+    const newSpookys = [...spookys];
+    if (!spookys[i]) {
+      newSpookys[i] = [mark];
+    } else {
+      newSpookys[i].push(mark);
+    }
+    setSpookys(newSpookys);
+  };
 
   const handleClick = (i: number) => {
-    // you can't put both spooky marks for a single turn in the same quant
-    if (!isFirstTurn() && state.lastMove === i) {
+    if (!isFirstTurn() && game.lastMove === i) {
+      console.log('cant place spooky mark in same square twice');
       return;
     }
 
-    const mark = `${state.player}${state.gameTurn}`; // X1, O2, etc
-    const spookys = state.spookys;
+    const mark = `${game.player}${game.gameTurn}`; // X1, O2, etc
 
-    const existing = spookys[i];
-    if (existing) {
-      existing.push(mark);
-    } else {
-      spookys[i] = [mark];
-    }
+    // if spooky mark already exists, add to it
+    setSpookyMarks(i, mark);
 
     if (!graph.containsNode(i)) {
       // don't replace the same node over and over if it already exists
       graph.addNode(i); // add a node on both turns
     }
 
-    if (!isFirstTurn() && state.lastMove) {
+    if (!isFirstTurn() && game.lastMove !== null) {
       // add edge after both spooky marks have been placed
-      graph.addEdge(state.lastMove, i, mark);
+      graph.addEdge(game.lastMove, i, mark);
+    }
+
+    if (graph.hasCycle(i)) {
+      const [cycleNodeIds, cycleNodeSpookys] = graph.getCycle(i);
+
+      console.log(
+        `A loop of entanglement has occured! Player ${opponent()} will decide which of the possible states the board will collapse into.`
+      );
     }
 
     if (isFirstTurn()) {
       // end of first player turn: increment
-      setState({
-        ...state,
-        playerTurn: state.playerTurn + 1,
+      setGame({
+        ...game,
+        playerTurn: game.playerTurn + 1,
         lastMove: i,
       });
     } else {
-      // end of second player turn: swap
-
-      setState({
-        ...state,
-        gameTurn: state.gameTurn + 1,
-        player: state.player === 'X' ? 'O' : 'X',
+      // end of second player turn: swap player and reset playerTurn
+      setGame({
+        ...game,
+        gameTurn: game.gameTurn + 1,
+        player: opponent(),
         playerTurn: 1,
         lastMove: i,
       });
     }
   };
 
+  function opponent(): Player {
+    return game.player === 'X' ? 'O' : 'X';
+  }
+
   function isFirstTurn(): boolean {
-    return state.playerTurn === 1;
+    return game.playerTurn === 1;
   }
 
   function resetGame(): void {
-    setState(initialState);
+    setGame(initialState);
+    setSquares(initialState.squares);
+    setSpookys(initialState.spookys);
+    setGraph(new Graph());
   }
 
-  function debugNodes(graph) {
-    const nodes = Object.keys(graph.nodes).map((k, i) => {
-      let spookys = [];
-      console.log(graph.nodes);
-      // const edges = Object.keys(graph.nodes[k].edges).map((j) => {
-      //   spookys.push(graph.nodes[k].edges[j].spooky);
-      // });
-
+  function debugNodes(graph: Graph) {
+    const nodes = Object.keys(graph.nodes).map((id) => {
+      const spookysForNode = spookys[id] || [];
       return (
-        <li key={i}>
-          {k}: {spookys.join(' ')}
+        <li key={id}>
+          {id}: {spookysForNode.join(' ')}
         </li>
       );
     });
@@ -100,26 +119,32 @@ function Game() {
     return <ul>{nodes}</ul>;
   }
 
-  const player = `${state.player}`;
-  const playerTurn = state.playerTurn;
-
   return (
     <div>
       <div className="game">
         <div className="game-board">
           <Board
-            squares={state.squares}
-            spookys={state.spookys}
+            squares={squares}
+            spookys={spookys}
             onClick={(i: number) => handleClick(i)}
           />
         </div>
         <div className="game-info">
           <div className="status">
-            {player}: Place spooky mark #{playerTurn}
+            {game.player}: Place spooky mark #{game.playerTurn}
           </div>
           <button onClick={() => resetGame()}>Reset Game</button>
         </div>
       </div>
+      <ul>
+        <li>isFirstTurn: {isFirstTurn() ? 'true' : 'false'}</li>
+        <li>lastMove: {game.lastMove}</li>
+        <li>gameTurn: {game.gameTurn}</li>
+        <li>playerTurn: {game.playerTurn}</li>
+        <li>player: {game.player}</li>
+      </ul>
+
+      <h2>Graph</h2>
       <ul>{debugNodes(graph)}</ul>
     </div>
   );
